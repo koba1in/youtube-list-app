@@ -1,0 +1,26 @@
+[package]
+name = "actix-app"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "app"
+path = "src/main.rs"
+
+[dependencies]
+actix-web = "4"
+actix-session = { version = "0.11", features = ["redis-session"]}
+tokio = { version = "1", features = ["full"]}
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1", features = ["derive"]}
+oauth2 = "5"
+url = "2.5.7"
+jsonwebtoken = "9"
+serde_json = "1"
+uuid = {version = "1", features = ["v4"]}
+redis = { version = "0.32", features = ["tls", "tokio-native-tls-comp"]}
+chrono = "0.4"
+serde_with = { version = "3", features = ["chrono"] }
+dotenv = "0.15.0"
+clippy = "0.0.302"
+actix-cors = "0.7.1"
