@@ -1,46 +1,24 @@
-# services:
-#   app:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
-#       network: host
-#     ports:
-#       - "8080:${PORT}"
-#     environment:
-#       HOST: ${HOST}
-#       PORT: ${PORT}
-#       REDIS_HOST: ${REDIS_HOST}
-#       REDIS_PORT: ${REDIS_PORT}
-#     depends_on:
-#       - redis
-
-#   redis:
-#     build:
-#       context: ../redis/
-#       dockerfile: Dockerfile
-#     ports:
-#       - "${REDIS_PORT_OUTER}:${REDIS_PORT_INNER}"
-
-version: "3.8"
-
 services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile  # 開発用Dockerfileに分ける
+      dockerfile: Dockerfile
+      network: host
     ports:
-      - "8080:${PORT:-8080}"
+      - "8080:${PORT}"
     environment:
-      HOST: ${HOST:-0.0.0.0}
-      PORT: ${PORT:-8080}
-      REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-    volumes:
-      - .:/app  # ソースコードをマウントして即反映
+      HOST: ${HOST}
+      PORT: ${PORT}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
     depends_on:
       - redis
 
   redis:
-    image: redis:alpine  # 開発中はビルドせず公式イメージで十分
+    build:
+      context: ../redis/
+      dockerfile: Dockerfile
     ports:
-      - "${REDIS_PORT_OUTER:-6379}:${REDIS_PORT_INNER:-6379}"
+      - "${REDIS_PORT_OUTER}:${REDIS_PORT_INNER}"
+
+

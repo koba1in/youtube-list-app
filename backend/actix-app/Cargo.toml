@@ -24,3 +24,4 @@ serde_with = { version = "3", features = ["chrono"] }
 dotenv = "0.15.0"
 clippy = "0.0.302"
 actix-cors = "0.7.1"
+hex = "0.4.3"

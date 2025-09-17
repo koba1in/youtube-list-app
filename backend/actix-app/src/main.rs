@@ -7,9 +7,13 @@ use actix_web::{
     middleware, web,
 };
 
+use hex::decode;
 use reqwest::{Client, ClientBuilder, redirect::Policy};
 use serde::{Deserialize, Serialize};
-use std::env;
+use std::{
+    env,
+    io::{Error, ErrorKind},
+};
 mod handler;
 mod logic;
 mod outer;
@@ -55,11 +59,16 @@ async fn not_found() -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
-    let store: RedisSessionStore = RedisSessionStore::new("redis://127.0.0.1:6379")
+    let redis_url = env::var("REDIS_URL")
+        .map_err(|_| Error::new(ErrorKind::Other, "failed to get redis url"))?;
+    let store: RedisSessionStore = RedisSessionStore::new(redis_url)
         .await
         .map_err(|_| std::io::Error::new(std::io::ErrorKind::Other, "failed to connect redis"))?;
-
-    let key = Key::generate();
+    let front_origin = env::var("FRONT_ORIGIN")
+        .map_err(|_| Error::new(ErrorKind::Other, "failed to get front origin"))?;
+    let key_hex = env::var("KEY").map_err(|_| Error::new(ErrorKind::Other, "failed to get key"))?;
+    let key = decode(key_hex).map_err(|_| Error::new(ErrorKind::Other, "failed to get key"))?;
+    let key = Key::from(key.as_ref());
 
     let http_client =
         web::Data::new(build_http_client().map_err(|_| {
@@ -68,28 +77,29 @@ async fn main() -> std::io::Result<()> {
     let oauth_client = web::Data::new(build_oauth().await.map_err(|_| {
         std::io::Error::new(std::io::ErrorKind::Other, "failed to build oauth client")
     })?);
-
+    let front_origin_data = web::Data::new(front_origin.clone());
     HttpServer::new(move || {
         App::new()
             .wrap(
                 Cors::default()
-                    .allowed_origin("http://localhost:3000")
-                    .allowed_origin("http://localhost:5000")
+                    .allowed_origin(&front_origin)
                     .allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![header::CONTENT_TYPE, header::AUTHORIZATION])
                     .supports_credentials(),
             )
             .wrap(middleware::Compress::default())
+            .wrap(middleware::DefaultHeaders::default())
             .wrap(create_session_middleware(store.clone(), key.clone()))
             .app_data(http_client.clone())
             .app_data(oauth_client.clone())
+            .app_data(front_origin_data.clone())
             .route("/auth/login", web::get().to(login))
             .route("/auth/callback", web::get().to(callback))
             .route("/auth/logout", web::post().to(logout))
             .route("/data", web::get().to(get_youtube_playlist))
             .default_service(web::to(not_found))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }

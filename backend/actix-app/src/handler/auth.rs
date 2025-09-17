@@ -60,6 +60,7 @@ pub async fn callback(
     http_client: Data<Client>,
     req: HttpRequest,
     query: Query<Code>,
+    front_origin: Data<String>,
 ) -> Result<impl Responder, Error> {
     let (uuid, csrf_token) = get_header_cookie(&req)?;
     let Code { code, state, scope } = query.into_inner();
@@ -84,11 +85,12 @@ pub async fn callback(
             .body(format!(
                 r#"
         <script>
-            window.opener.postMessage({{ csrf_token: "{}" }}, "http://localhost:3000");
+            window.opener.postMessage({{ csrf_token: "{}" }}, "{}");
             window.close();
         </script>
         "#,
-                new_csrf_token.into_secret()
+                new_csrf_token.into_secret(),
+                front_origin.into_inner()
             )));
     }
     Err(error::ErrorInternalServerError(

@@ -12,6 +12,7 @@ dependencies = [
  "chrono",
  "clippy",
  "dotenv",
+ "hex",
  "jsonwebtoken",
  "oauth2",
  "redis",
