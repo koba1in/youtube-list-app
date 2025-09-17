@@ -41,25 +41,27 @@ pub async fn get_playlist(
     let res = if let Some(next_page_token) = next_page_token {
         http_client
             .get("https://www.googleapis.com/youtube/v3/playlistItems")
-            .header(AUTHORIZATION, [token_type, access_token].join(" "))
+            .bearer_auth(access_token)
+            // .header(AUTHORIZATION, [token_type, access_token].join(" "))
             .query(&[
                 ("part", "snippet"),
                 ("maxResults", "50"),
                 ("playlistId", playlist_id),
                 ("pageToken", &next_page_token),
-                ("key", api_key),
+                //("key", api_key),
             ])
             .send()
             .await?
     } else {
         http_client
             .get("https://www.googleapis.com/youtube/v3/playlistItems")
-            .header(AUTHORIZATION, [token_type, access_token].join(" "))
+            .bearer_auth(access_token)
+            // .header(AUTHORIZATION, [token_type, access_token].join(" "))
             .query(&[
                 ("part", "snippet"),
                 ("maxResults", "50"),
                 ("playlistId", playlist_id),
-                ("key", api_key),
+                //("key", api_key),
             ])
             .send()
             .await?

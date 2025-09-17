@@ -91,18 +91,18 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Compress::default())
             .wrap(
                 middleware::DefaultHeaders::default()
-                    .add((
-                        "Strict-Transport-Security",
-                        "max-age=31536000; includeSubDomains",
-                    ))
-                    .add(("X-Frame-Options", "DENY"))
-                    .add(("X-Content-Type-Options", "nosniff"))
-                    .add(("X-XSS-Protection", "1; mode=block"))
-                    .add((
-                        "Content-Security-Policy",
-                        "script-src 'nonce-random-nonce-value",
-                    ))
-                    .add(("Referrer-Policy", "no-referrer")),
+                    // .add((
+                    //     "Strict-Transport-Security",
+                    //     "max-age=31536000; includeSubDomains",
+                    // ))
+                    // .add(("X-Frame-Options", "DENY"))
+                    // .add(("X-Content-Type-Options", "nosniff"))
+                    // .add(("X-XSS-Protection", "1; mode=block"))
+                    // .add((
+                    //     "Content-Security-Policy",
+                    //     "script-src 'nonce-random-nonce-value",
+                    // ))
+                    // .add(("Referrer-Policy", "no-referrer")),
             )
             .app_data(http_client.clone())
             .app_data(oauth_client.clone())
