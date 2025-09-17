@@ -80,6 +80,7 @@ async fn main() -> std::io::Result<()> {
     let front_origin_data = web::Data::new(front_origin.clone());
     HttpServer::new(move || {
         App::new()
+            .wrap(create_session_middleware(store.clone(), key.clone()))
             .wrap(
                 Cors::default()
                     .allowed_origin(&front_origin)
@@ -88,8 +89,21 @@ async fn main() -> std::io::Result<()> {
                     .supports_credentials(),
             )
             .wrap(middleware::Compress::default())
-            .wrap(middleware::DefaultHeaders::default())
-            .wrap(create_session_middleware(store.clone(), key.clone()))
+            .wrap(
+                middleware::DefaultHeaders::default()
+                    .add((
+                        "Strict-Transport-Security",
+                        "max-age=31536000; includeSubDomains",
+                    ))
+                    .add(("X-Frame-Options", "DENY"))
+                    .add(("X-Content-Type-Options", "nosniff"))
+                    .add(("X-XSS-Protection", "1; mode=block"))
+                    .add((
+                        "Content-Security-Policy",
+                        "script-src 'nonce-random-nonce-value",
+                    ))
+                    .add(("Referrer-Policy", "no-referrer")),
+            )
             .app_data(http_client.clone())
             .app_data(oauth_client.clone())
             .app_data(front_origin_data.clone())
