@@ -48,7 +48,7 @@ export function Body({ auth }: { auth: Auth }) {
                 }}>
                     <VideoList youtube_list={snippets} setIndex={setIndex} />
                 </Grid>
-                <Grid sx={{ flexGrow: 1, backgroundColor: index === null ? "primary" : "black"}}>
+                <Grid sx={{ flexGrow: 1, backgroundColor: index === null ? "primary" : "black" }}>
                     {index !== null && snippets !== null && true &&
                         <YouTube
                             videoId={snippets[index].resourceId.videoId}
