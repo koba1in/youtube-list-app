@@ -53,7 +53,7 @@ export function YoutubeForm({ setSnippets, loading, setLoading, setIndex, auth }
             id="filled-error"
             label={errors.url?.message}
             {...register("url")}
-            placeholder="https://www.youtube.com/playlist?list=WL"
+            placeholder="https://www.youtube.com/playlist?list=LL"
             sx={{ width: "100%" }}
             error={Boolean(errors.url?.message)}
             onKeyDown={handleKeyDown}

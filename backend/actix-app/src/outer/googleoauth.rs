@@ -62,7 +62,7 @@ pub async fn create_oauth(
     let (auth_url, csrf_token) = client
         .authorize_url(CsrfToken::new_random)
         .add_scope(Scope::new(
-            "https://www.googleapis.com/auth/youtube.force-ssl".into(),
+            "https://www.googleapis.com/auth/youtube.readonly".into(),
         ))
         .set_pkce_challenge(pkce_challenge)
         .url();

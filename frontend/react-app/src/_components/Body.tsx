@@ -5,6 +5,10 @@ import { YoutubeForm } from './YoutubeForm';
 import { Auth, YoutubeList } from '../_utils/type';
 import YouTube, { YouTubeProps } from 'react-youtube';
 import { VideoList } from './List';
+import { css } from '@emotion/react';
+import { Height } from '@mui/icons-material';
+import './iframe.css';
+
 
 
 export function Body({ auth }: { auth: Auth }) {
@@ -12,21 +16,7 @@ export function Body({ auth }: { auth: Auth }) {
     const [loading, setLoading] = useState<boolean>(false);
     const [index, setIndex] = useState<number | null>(null);
     const [ready, setReady] = useState(false);
-    const [iframeheight, setIframeheight] = useState(0);
-    const [iframewidth, setIframewidth] = useState(0);
 
-    const updateIframeSize = () => {
-        const height = window.innerHeight;
-        const width = window.innerWidth;
-        setIframeheight(height - 120);
-        setIframewidth(width * 0.65);
-    }
-
-    useEffect(() => {
-        updateIframeSize();
-        window.addEventListener("resize", updateIframeSize);
-        return () => window.removeEventListener("resize", updateIframeSize);
-    }, []);
 
     const onReady = () => {
         const onReady: YouTubeProps["onReady"] = (e) => {
@@ -37,28 +27,29 @@ export function Body({ auth }: { auth: Auth }) {
     }
 
     return (
-        <Grid container direction="column" sx={{ height: "100%", display: "flex" }} >
-            <Grid sx={{ height: "60px", width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px", }} >
+        <Box sx={{ height: "100%" }}>
+            <Box sx={{ height: "60px", width: "100%", justifyContent: "center", alignItems: "center", padding: "10px", }} >
                 <YoutubeForm setSnippets={setSnippets} loading={loading} setLoading={setLoading} setIndex={setIndex} auth={auth} />
-            </Grid>
-            <Grid container direction="row" sx={{ flexGrow: 1, display: "flex" }}>
+            </Box>
+            <Grid container direction="row" sx={{ height: "calc(100% - 60px)" }}>
                 <Grid sx={{
                     width: "35%",
-                    height: "calc(100vh - 110px)",
+                    height: "100%",
                 }}>
                     <VideoList youtube_list={snippets} setIndex={setIndex} />
                 </Grid>
-                <Grid sx={{ flexGrow: 1, backgroundColor: index === null ? "primary" : "black" }}>
-                    {index !== null && snippets !== null && true &&
+                <Grid sx={{ width: "65%", height: "100%", backgroundColor: index === null ? "primary" : "black" }}>
+                    {index !== null && snippets !== null &&
                         <YouTube
                             videoId={snippets[index].resourceId.videoId}
-                            opts={{ height: iframeheight, width: iframewidth, playerVars: { autoplay: 1, rel: 0, } }}
+                            className="iframeStyle"
+                            opts={{ width: "100%", height: "100%", playerVars: { autoplay: 1, rel: 0, } }}
                             onEnd={() => setIndex(index + 1 === snippets.length ? 0 : index + 1)}
                             onReady={onReady}
                         />
                     }
                 </Grid>
-            </Grid>
-        </Grid >
+            </Grid >
+        </Box >
     )
 };
